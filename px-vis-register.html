@@ -503,7 +503,7 @@ Custom property | Description
     },
 
     _seriesToDisplayChanged: function _seriesToDisplayChanged() {
-      return this._validSeriesToDisplay() && this._series.indexOf(this.tooltipData.seriesToDisplay) < 0;
+      return this._validSeriesToDisplay() && this._series && this._series.indexOf(this.tooltipData.seriesToDisplay) < 0;
     },
 
     _validSeriesToDisplay: function _validSeriesToDisplay() {
