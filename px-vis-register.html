@@ -493,11 +493,22 @@ Custom property | Description
         if(this.tooltipData && this.completeSeriesConfig) {
           this._formatDateTime();
 
-          if(this._currentSortType && this.sortConfig && this.sortConfig[this._currentSortType].sortOnDataChange) {
+          let sortOnDataChange = this._currentSortType && this.sortConfig && this.sortConfig[this._currentSortType].sortOnDataChange;
+
+          if(sortOnDataChange || this._seriesToDisplayChanged()) {
             this._computeSeries(true);
           }
         }
       },1);
+    },
+
+    _seriesToDisplayChanged: function _seriesToDisplayChanged() {
+      return this._validSeriesToDisplay() && this._series.indexOf(this.tooltipData.seriesToDisplay) < 0;
+    },
+
+    _validSeriesToDisplay: function _validSeriesToDisplay() {
+      var seriesToDisplay = this.tooltipData.seriesToDisplay;
+      return seriesToDisplay && seriesToDisplay.length > 0 && this.completeSeriesConfig[seriesToDisplay];
     },
 
     _seriesChanged: function() {
@@ -553,29 +564,35 @@ Custom property | Description
      *
     */
     _getSeries: function(doDataSort) {
-      var series = Object.keys(this.completeSeriesConfig);
+      var series = [];
 
-      series.forEach(function(s,i) {
-        if(this.completeSeriesConfig[s]['hideInRegister']) {
-          series.splice(i, 1);
-        }
-      }.bind(this));
+      if (this._validSeriesToDisplay()) {
+        series = [this.tooltipData.seriesToDisplay];
+      } else {
+        var series = Object.keys(this.completeSeriesConfig);
 
-      //apply all sorting defined
-      if(this._currentSortType) {
-        this._internalSortConfig[this._currentSortType].sortOnSeries.forEach(function(item) {
-          series = series.sort(item.bind(this));
+        series.forEach(function(s,i) {
+          if(this.completeSeriesConfig[s]['hideInRegister']) {
+            series.splice(i, 1);
+          }
         }.bind(this));
 
-        if(doDataSort) {
-          this._internalSortConfig[this._currentSortType].sortOnData.forEach(function(item) {
+        //apply all sorting defined
+        if(this._currentSortType) {
+          this._internalSortConfig[this._currentSortType].sortOnSeries.forEach(function(item) {
             series = series.sort(item.bind(this));
           }.bind(this));
-        }
-      }
 
-      if(this.sortDescending) {
-        series.reverse();
+          if(doDataSort) {
+            this._internalSortConfig[this._currentSortType].sortOnData.forEach(function(item) {
+              series = series.sort(item.bind(this));
+            }.bind(this));
+          }
+        }
+
+        if(this.sortDescending) {
+          series.reverse();
+        }
       }
 
       return series;
