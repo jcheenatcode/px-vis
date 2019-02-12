@@ -839,6 +839,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           shortestDistanceToMouse = Number.MAX_VALUE;
           //search for timestamp if we don't have it already (non time based chart) and we know the data has some notion of time -- !! --> turn into a bool
           var searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
+          var closestTime = undefined;
 
       for(var i = 0; i < keys.length; i++) {
         //if we had a request to reset tooltip stop calculating
@@ -852,6 +853,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
           if (closestTimestamp.distance && closestTimestamp.distance < shortestDistanceToMouse) {
             shortestDistanceToMouse = closestTimestamp.distance;
+            closestTime = closestTimestamp.time;
             dataObj.seriesToDisplay = keys[i];
           }
         } else {
@@ -859,9 +861,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         }
       } //for
 
+      for(var _i = 0; _i < dataObj.series.length; _i++) {
+        if(dataObj.series[_i].name === dataObj.seriesToDisplay) {
+          dataObj.series = [dataObj.series[_i]];
+
+          var seriesObj = {};
+          seriesObj[dataObj.seriesToDisplay] = dataObj.seriesObj[dataObj.seriesToDisplay];
+          dataObj.seriesObj = seriesObj;
+        }
+      }
+
       // add the timestamp
-      if(searchTimeStamp && closestTimestamp.time) {
-        dataObj.time = closestTimestamp.time;
+      if(searchTimeStamp && closestTime) {
+        dataObj.time = closestTime;
       }
     },
 
