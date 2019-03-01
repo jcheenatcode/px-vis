@@ -463,11 +463,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _startStriping: function() {
       this.set('extentsAction', 'stripe');
+      // SMARTSIGNAL - fire event to track the chart that was clicked first
+      this.fire('px-vis-start-action-box');
       this._drawActionBox();
     },
 
     _startZooming: function() {
       this.set('extentsAction', 'zoom');
+      // SMARTSIGNAL - fire event to track the chart that was clicked first
+      this.fire('px-vis-start-action-box');
       this._drawActionBox();
     },
 
@@ -1608,6 +1612,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       Px.d3.select(document).on('mouseup.action', null);
       Px.d3.select(document).on('mousemove.action', null);
 
+      // SMARTSIGNAL: If the mouse down action was executed on this interaction space
       if(this.mouseDown) {
         this.mouseDown = false;
         var extents = {};
@@ -1659,6 +1664,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           width: null,
           height: null
         }
+      } else {
+        // SMARTSIGNAL: If the mouse down action was executed on a different interaction space, fire an event
+        this.fire('px-vis-end-action-box');
       }
     },
 
